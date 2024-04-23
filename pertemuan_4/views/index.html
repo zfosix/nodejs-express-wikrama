@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Document</title>
+</head>
+
+<body>
+     <div id="getBooks">
+          <form action="" id="form_book">
+               <h5>Add Book</h5>
+               <input type="text" id="nama" placeholder="Nama" name="nama" style="margin-bottom: 10px;">
+               <input type="text" id="author" placeholder="Author" name="author" style="margin-bottom: 10px;">
+               <input type="text" id="year" placeholder="Year" name="year" style="margin-bottom: 10px;">
+               <input type="number" id="page_count" placeholder="Page Count" name="page_count"
+                    style="margin-bottom: 10px;">
+               <input type="text" id="publisher" placeholder="Publisher" name="publisher" style="margin-bottom: 10px;">
+               <input type="submit" value="Kirim">
+          </form>
+
+          <table border="1" id="data" style="margin-top: 30px;">
+          </table>
+     </div>
+
+     <script>
+          const url = "http://localhost:3000"
+
+          async function postData(url = "", data = {}) {
+               try {
+                    const response = await fetch(url, {
+                         method: "POST",
+                         headers: {
+                              "Content-Type": "appliacation/json",
+                         },
+                         body: JSON.stringify(data),
+                    });
+
+                    if (!response.ok) {
+                         throw new Error("Terjadi kesalahan pada server.");
+                    }
+                    return await response.json();
+               } catch (error) {
+                    throw new Error("Terjadi kesalahan:", error.message);
+               }
+          }
+
+          document.getElementById("addBook").addEventListener("submit", async function (e) {
+               const formData = new FormData(this);
+               const data = {};
+               formData.forEach((value, key) => {
+                    data[key] = value;
+               });
+               try {
+                    const result = await postData(url, data);
+               } catch (error) {
+                    console.error(error.message);
+               }
+          });
+
+          const elm_dataBuku = document.getElementById("getBooks");
+          async function getBooks() {
+               const api = await fetch(url);
+               const { data } = await api.json();
+               data.forEach((data) => {
+                    const element_buku = document.createElement("div");
+                    element_buku.innerHTML = `
+                    id: ${data.id},
+                    Nama Buku: ${data.nama},
+                    Publisher: ${data.publisher},
+                    Year: ${data.year},
+                    Page Count: ${data.page_count}
+                    `
+                    elm_dataBuku.appendChild(element_buku);
+               });
+          }
+          getBooks();
+
+     </script>
+
+</body>
+
+</html>
